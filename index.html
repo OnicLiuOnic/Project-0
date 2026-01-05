@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日日期資訊板 | Project-0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: #fff;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mx-auto px-4">
+        <div class="glass-card max-w-md mx-auto p-8 text-center transition-all duration-500 hover:scale-[1.02]">
+            <!-- 標題圖示 -->
+            <div class="flex justify-center mb-6">
+                <div class="p-4 bg-white/20 rounded-full">
+                    <i data-lucide="calendar" class="w-12 h-12 text-white"></i>
+                </div>
+            </div>
+
+            <!-- 專案名稱 -->
+            <h2 class="text-sm uppercase tracking-widest opacity-70 mb-2">Project-0 Dashboard</h2>
+            
+            <!-- 日期顯示區域 -->
+            <div id="date-container" class="space-y-2">
+                <h1 id="current-year-month" class="text-2xl font-light">正在讀取...</h1>
+                <div id="current-day" class="text-8xl font-bold my-4">--</div>
+                <h3 id="current-weekday" class="text-xl font-medium tracking-wide bg-white/20 py-2 px-4 rounded-lg inline-block">
+                    載入中
+                </h3>
+            </div>
+
+            <hr class="my-8 border-white/20">
+
+            <!-- 即時時鐘 -->
+            <div class="flex items-center justify-center space-x-2 text-lg opacity-90">
+                <i data-lucide="clock" class="w-5 h-5"></i>
+                <span id="live-clock" class="font-mono">00:00:00</span>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <button onclick="copyDate()" class="mt-8 w-full py-3 px-6 bg-white/10 hover:bg-white/20 border border-white/30 rounded-xl transition-all flex items-center justify-center space-x-2 group">
+                <i data-lucide="copy" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+                <span>複製今日日期</span>
+            </button>
+            
+            <p id="copy-toast" class="mt-4 text-xs font-medium text-green-300 opacity-0 transition-opacity">已成功複製到剪貼簿！</p>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Lucide 圖示
+        lucide.createIcons();
+
+        function updateDateTime() {
+            const now = new Date();
+            
+            // 格式化日期 (繁體中文選項)
+            const options = { year: 'numeric', month: 'long' };
+            const yearMonthStr = now.toLocaleDateString('zh-TW', options);
+            const dayStr = now.getDate();
+            const weekdayStr = now.toLocaleDateString('zh-TW', { weekday: 'long' });
+            
+            // 更新 DOM
+            document.getElementById('current-year-month').textContent = yearMonthStr;
+            document.getElementById('current-day').textContent = dayStr;
+            document.getElementById('current-weekday').textContent = weekdayStr;
+            
+            // 更新時鐘
+            const timeStr = now.toLocaleTimeString('zh-TW', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            document.getElementById('live-clock').textContent = timeStr;
+        }
+
+        // 複製功能
+        function copyDate() {
+            const now = new Date();
+            const fullDate = now.toLocaleDateString('zh-TW', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit' 
+            });
+            
+            const dummy = document.createElement('textarea');
+            document.body.appendChild(dummy);
+            dummy.value = fullDate;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            // 顯示成功提示
+            const toast = document.getElementById('copy-toast');
+            toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 2000);
+        }
+
+        // 每秒更新
+        setInterval(updateDateTime, 1000);
+        updateDateTime(); // 初始呼叫
+    </script>
+</body>
+</html>
